@@ -1,0 +1,20 @@
+<div class="card">
+    <div class="card-header">
+      <h3>Company Details</h3>
+    </div>
+    <div class="card-body">
+      <div>
+        <strong>Name:</strong> {{ company?.name }}
+      </div>
+      <div>
+        <strong>Email:</strong> {{ company?.email }}
+      </div>
+      <div>
+        <strong>Address:</strong> {{ company?.address }}
+      </div>
+      <button type="button" class="btn btn-primary mt-3 me-2" (click)="updateCompany()">Update Company Details</button>
+      <button type="button" class="btn btn-primary mt-3 me-2" (click)="updateTerms()">Update Company Terms</button>
+      <button type="button" class="btn btn-primary mt-3" (click)="updateEntryDetails()">Update User Name and Password</button>
+    </div>
+  </div>
+  

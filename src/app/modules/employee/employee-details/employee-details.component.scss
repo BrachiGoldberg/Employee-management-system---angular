@@ -1,0 +1,7 @@
+.custom-dialog-container {
+    transform: translate(-50%, -50%) !important; /* Center the dialog horizontally and vertically */
+  }
+  
+  .mat-dialog-container {
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+  }

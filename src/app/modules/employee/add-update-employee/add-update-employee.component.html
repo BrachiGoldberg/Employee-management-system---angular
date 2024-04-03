@@ -1,0 +1,151 @@
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <form [formGroup]="employeeFrom!" class="p-4">
+
+                <button class="btn btn-danger mb-3" (click)="removeEmp()">Delete Employee</button>
+                <button class="btn btn-primary mb-3 ms-2" (click)="updateTerms()">Update Terms</button>
+                <button class="btn btn-primary mb-3 ms-2" (click)="updateBankAccout()">Update Bank Account</button>
+
+                <div class="mb-3">
+                    <label for="identity" class="form-label">Identity</label>
+                    <input id="identity" formControlName="identity" type="text" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input id="firstName" formControlName="firstName" type="text" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input id="lastName" formControlName="lastName" type="text" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <input id="address" formControlName="address" type="text" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input id="email" formControlName="email" type="text" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="credits" class="form-label">Credits</label>
+                    <input id="credits" formControlName="credits" type="number" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label d-block">Is Male</label>
+                    <div class="form-check form-check-inline">
+                        <input id="isMale" formControlName="isMale" class="form-check-input" [value]="true"
+                            type="radio" />
+                        <label class="form-check-label" for="isMale">Male</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input id="isFemale" formControlName="isMale" class="form-check-input" [value]="false"
+                            type="radio" />
+                        <label class="form-check-label" for="isFemale">Female</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="birthDate" class="form-label">Birth Date</label>
+                    <input id="birthDate" formControlName="birthDate" type="date" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="startJob" class="form-label">Start Job</label>
+                    <input id="startJob" formControlName="startJob" type="date" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <div class="fw-bold">Employee Positions</div>
+                    @for(position of empPositions; track $index){
+                    <div class="mb-3">
+                        <div>{{getPositionName(position.positionId!)}}</div>
+                        <button class="btn btn-danger" (click)="removePosition(position.positionId!)">Remove this
+                            position</button>
+                    </div>
+                    }
+
+                    <button class="btn btn-success" (click)="changeAbleList()">Do you want add position to the employee?
+                        click here</button>
+                    @if(isAbleListPositions){
+                    <div class="mb-3">
+                        <button class="btn btn-success" (click)="ableNewPosition()">Did you not find the right position?
+                            Click here</button>
+                        <label class="form-label fw-bold">All Positions</label>
+                        @if(isShowDateField){
+                        <form [formGroup]="posForm">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Start Job</label>
+                                <input id="date" formControlName="date" type="date" class="form-control" />
+                                @if (!validPosForm) {
+                                @if(positionFormControls['date'].errors &&
+                                positionFormControls['date'].errors['required'] ){
+                                <span class="text-danger">Date of start position is required</span>
+                                }
+                                @else {
+                                <span class="text-danger">Date of start position must be after start job date</span>
+                                }
+                                }
+                            </div>
+                        </form>
+                        <button class="btn btn-success" (click)="enableAddPosition()">Add position</button>
+                        }
+                        <ul class="list-group">
+                            @for (position of showPositions; track $index) {
+                            <li
+                                class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span>name: {{ position.name }}</span>
+                                    <span *ngIf="position.isAdministrative" class="ms-2">(Administrative)</span>
+                                </div>
+                                <button class="btn btn-success" (click)="addDateField(position.id!)">
+                                    Add Position
+                                </button>
+                            </li>
+                            }
+                        </ul>
+                    </div>
+                    }
+                </div>
+
+                <button class="btn btn-primary" (click)="save()">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@if(isAbleNewPosition){
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <form [formGroup]="newPosForm" class="p-4">
+                <div class="mb-3">
+                    <h5>New Position</h5>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name Position</label>
+                    <input id="name" formControlName="name" type="text" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Is Administrative</label>
+                    <div class="form-check">
+                        <input id="isa1" formControlName="isAdministrative" value="true" type="radio"
+                            class="form-check-input" />
+                        <label for="isa1" class="form-check-label">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input id="isa2" formControlName="isAdministrative" value="false" [checked]="true" type="radio"
+                            class="form-check-input" />
+                        <label for="isa2" class="form-check-label">No</label>
+                    </div>
+                    @if(!validNewPosForm && newPositionControlers['name'].errors == null){
+                    <span>this position already exists</span>
+                    }
+                </div>
+                <button type="button" (click)="postPosition()" class="btn btn-primary">Add the position</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+}

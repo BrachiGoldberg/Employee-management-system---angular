@@ -1,0 +1,75 @@
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card" style="width: 700px;">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-column align-items-start">
+                    <button class="btn btn-primary btn-sm mb-2" (click)="updateEmp()">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="removeEmp()">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </div>
+                <!-- <div>
+                    <button class="btn btn-primary btn-sm mb-2" (click)="updateEmp()">
+                        print
+                    </button>
+                </div> -->
+            </div>
+            <h5 class="card-title mb-0">Employee Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex mb-3">
+                        <label for="identity" class="form-label me-2 fw-semibold">Identity:</label>
+                        <div>{{ employee?.identity }}</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <label for="lastName" class="form-label me-2 fw-semibold">Last Name:</label>
+                        <div>{{ employee?.lastName }}</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <label for="firstName" class="form-label me-2 fw-semibold">First Name:</label>
+                        <div>{{ employee?.firstName }}</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <label for="address" class="form-label me-2 fw-semibold">Address:</label>
+                        <div>{{ employee?.address }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex mb-3">
+                        <label for="email" class="form-label me-2 fw-semibold">Email:</label>
+                        <div>{{ employee?.email }}</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <label for="bitrhDate" class="form-label me-2 fw-semibold">Birth Date:</label>
+                        <div>{{ employee?.birthDate }}</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <label for="startJob" class="form-label me-2 fw-semibold">Start Job Date:</label>
+                        <div>{{ employee?.startJob }}</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <label for="credits" class="form-label me-2 fw-semibold">Credits Points:</label>
+                        <div>{{ employee?.credits }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Positions:</label>
+                <ul>
+                    @for (pos of employee?.positions; track $index) {
+                    <li>
+                        <div class="d-flex mb-3">
+                            <div>{{ getPositionName(pos.positionId!) }}</div>
+                            <div> Here is the start position date</div>
+                        </div>
+                    </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

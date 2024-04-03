@@ -1,0 +1,52 @@
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <h3 class="my-4">Company Terms</h3>
+            <form [formGroup]="termsForm" class="card p-4">
+
+
+                <div class="mb-3">
+                    <label for="meals"  class="form-label">Meals</label>
+                    <input id="meals" formControlName="meals" type="number" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="nightShiftPrecent"  class="form-label">Night Shift Precent</label>
+                    <input id="nightShiftPrecent" formControlName="nightShiftPrecent" type="number" class="form-control"/>
+                </div >
+                <div class="mb-3">
+                    <label for="shabbatShiftPrecent"  class="form-label">Shabbat Shift Precent</label>
+                    <input id="shabbatShiftPrecent" formControlName="shabbatShiftPrecent" type="number" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="gifts"  class="form-label">Gifts</label>
+                    <input id="gifts" formControlName="gifts" type="number" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="clothing"  class="form-label">Clothing</label>
+                    <input id="clothing" formControlName="clothing" type="number" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="recovery" class="form-label">Recovery</label>
+                    <input id="recovery" formControlName="recovery" type="number" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="birthDays" class="form-label">BirthDays</label>
+                    <input id="birthDays" formControlName="birthDays" type="number" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="daySalariesCalculation" class="form-label">Day Salaries Calculation</label>
+                    <input id="daySalariesCalculation" formControlName="daySalariesCalculation" type="number" class="form-control"/>
+                    @if (!validForm &&termsControlers['daySalariesCalculation'].errors) {
+                    @if(termsControlers['daySalariesCalculation'].errors['required']){
+                    <span class="text-danger">Day salaries calculation is required</span>
+                    }
+                    @else {
+                    <span class="text-danger">Day salaries calculation value must have between 1 to 30</span>
+                    }
+                    }
+                </div>
+                <button type="button" (click)="submitForm()" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+</div>

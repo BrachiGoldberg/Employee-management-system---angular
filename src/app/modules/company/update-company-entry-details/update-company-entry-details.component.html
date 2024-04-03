@@ -1,0 +1,34 @@
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <h3 class="my-4">User Name and Password</h3>
+
+            <form [formGroup]="entryForm" class="card p-4">
+
+                <div class="mb-3">
+                    <label for="userName" class="form-label">Company UserName</label>
+                    <input id="userName" formControlName="userName" name="userName" class="form-control"/>
+                    @if (!validForm &&entryFormControls['userName'].errors) {
+                    <span class="text-danger">User name is required</span>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Company Password</label>
+                    <input id="password" formControlName="password" name="password" class="form-control"/>
+                    @if (!validForm &&entryFormControls['password'].errors) {
+                    @if(entryFormControls['password'].errors['required']){
+                    <span class="text-danger">Password is required</span>
+                    }
+                    @else{
+                    <span class="text-danger">Password should contain at least 8 characters,
+                        one uppercase letter, one lowercase letter and one number
+                    </span>
+                    }
+                    }
+                </div>
+
+                <button (click)="saveChanges()" class="btn btn-primary">Save changes</button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Employee Terms</h3>
+                </div>
+                <div class="card-body">
+                    <form [formGroup]="formTerms">
+                        <div class="mb-3">
+                            <label for="hourlyWage" class="form-label">Hourly Wage</label>
+                            <input id="hourlyWage" type="number" formControlName="hourlyWage" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="overtimePay" class="form-label">Overtime Pay</label>
+                            <input id="overtimePay" type="number" formControlName="overtimePay" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="monthlyHoursCount" class="form-label">Monthly Hours Count</label>
+                            <input id="monthlyHoursCount" type="number" formControlName="monthlyHoursCount"
+                                class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="travelExpenses" class="form-label">Travel Expenses</label>
+                            <input id="travelExpenses" type="number" formControlName="travelExpenses"
+                                class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sickDays" class="form-label">Sick Days</label>
+                            <input id="sickDays" type="number" formControlName="sickDays" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="educationFund" class="form-label">Education Fund</label>
+                            <input id="educationFund" type="number" formControlName="educationFund"
+                                class="form-control" />
+                        </div>
+
+                        <button type="button" (click)="save()" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

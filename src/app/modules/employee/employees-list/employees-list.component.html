@@ -1,0 +1,46 @@
+<div class="container">
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-primary" (click)="companyDetails()">Show Company Details</button>
+      </div>
+      <div class="col">
+        <button class="btn btn-primary" (click)="downloadCsv()">Download CSV</button>
+      </div>
+      <div class="col">
+        <button class="btn btn-primary" (click)="addNewEmployee()">Add Employee</button>
+      </div>
+    </div>
+  </div>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Start Job</th>
+            <th>More info</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (employee of employeesList; track $index) {
+        <tr>
+            <td class="identity">{{ $index }}</td>
+            <td>{{ employee.firstName }}</td>
+            <td>{{ employee.lastName }}</td>
+            <td>{{ employee.address }}</td>
+            <td>{{ employee.email }}</td>
+            <td>{{ employee.startJob }}</td>
+            <td>
+                <button class="btn btn-sm btn-primary me-2" (click)="moredetails(employee.id!)">
+                    <i class="bi bi-info-circle"></i>
+                </button>
+            </td>
+        </tr>}
+    </tbody>
+</table>
+
+<router-outlet></router-outlet>

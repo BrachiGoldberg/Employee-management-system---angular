@@ -1,0 +1,80 @@
+<!-- <router-outlet></router-outlet> -->
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <h4 class="mt-4">Register your company</h4>
+            <form [formGroup]="comopanyForm" class="card p-4">
+                <div class="mb-3">{{company.name}}
+                    <label for="name" class="form-label">Company Name</label>
+                    <input id="name" formControlName="name" name="name" class="form-control"/>
+                    @if (!validForm && registerFormControls['name'].errors) {
+                    <span class="text-danger">Name is required</span>
+                    }
+
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description your comapny</label>
+                    <input id="description" formControlName="description" name="description" class="form-control"/>
+                    @if (!validForm &&registerFormControls['description'].errors) {
+                    <span class="text-danger">Description is required</span>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Company Address</label>
+                    <input id="address" formControlName="address" name="address" class="form-control"/>
+                    @if (!validForm &&registerFormControls['address'].errors) {
+                    <span class="text-danger">Address is required</span>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Company Email</label>
+                    <input id="email" formControlName="email" name="email" class="form-control"/>
+                    @if (!validForm &&registerFormControls['email'].errors) {
+                    @if(registerFormControls['email'].errors['required']){
+                    <span class="text-danger">Email is required</span>
+                    }
+                    @else {
+                    <span class="text-danger">Email address is invalid</span>
+                    }
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="userName" class="form-label">Company UserName</label>
+                    <input id="userName" formControlName="userName" name="userName" class="form-control"/>
+                    @if (!validForm &&registerFormControls['userName'].errors) {
+                    <span class="text-danger">User name is required</span>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Company Password</label>
+                    <input id="password" formControlName="password" name="password" class="form-control"/>
+                    @if (!validForm &&registerFormControls['password'].errors) {
+                    @if(registerFormControls['password'].errors['required']){
+                    <span class="text-danger">Password is required</span>
+                    }
+                    @else{
+                    <span class="text-danger">Password should contain at least 8 characters,
+                        one uppercase letter, one lowercase letter and one number
+                    </span>
+                    }
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="managerIdentity" class="form-label">Manager Identity</label>
+                    <input id="managerIdentity" formControlName="managerIdentity" class="form-control"/>
+                    @if (!validForm &&registerFormControls['managerIdentity'].errors) {
+                    @if(registerFormControls['managerIdentity'].errors['required']){
+                    <span class="text-danger">Manager identity is required</span>
+                    }
+
+                    @else {
+                    <span class="text-danger">Manager identity must include 9 numbers</span>
+                    }
+                    }
+                </div>
+
+                <button type="submit" (click)="register()" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
