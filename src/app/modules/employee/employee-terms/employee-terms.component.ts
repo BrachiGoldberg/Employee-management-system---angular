@@ -3,6 +3,7 @@ import { EmployeeTerms } from '../employee-terms.model';
 import { EmployeeService } from '../employee.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { UnauthorizedError, errorsEnum } from '../../../app.component';
 
 @Component({
   selector: 'app-employee-terms',
@@ -74,22 +75,44 @@ export class EmployeeTermsComponent {
             this._router.navigate(['employee/new-account-b'])
         },
         error: err => {
-          console.log("Oops... there is an error", err)
+          this.errosFunction(err.status)
         }
       })
     }
   }
 
-  updateTerms(){
+  updateTerms() {
     this._service.updateEmpTerms(this.termsId!, this.terms).subscribe({
       next: data => {
         console.log("terms update succeessful", data)
         history.back()
       },
       error: err => {
-        console.log("I have error", err)
+        this.errosFunction(err.status)
       }
     })
   }
+  errosFunction(statusCode: number) {
+    switch (statusCode) {
+      case 400:
+        this.badRequest()
+        break
+      case 401:
+        UnauthorizedError()
+        break
+      case 404:
+        this.pageNotFound()
+        break
+      default:
+        this._router.navigate(['error'])
+    }
+  }
 
+  badRequest() {
+    this._router.navigate([`error?mess=${errorsEnum.BADREQUEST}`])
+  }
+
+  pageNotFound() {
+    this._router.navigate([`error?mess=${errorsEnum.NOTFOUND}`])
+  }
 }

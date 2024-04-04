@@ -1,46 +1,70 @@
 <div class="container">
-    <div class="row">
-      <div class="col">
-        <button class="btn btn-primary" (click)="companyDetails()">Show Company Details</button>
-      </div>
-      <div class="col">
-        <button class="btn btn-primary" (click)="downloadCsv()">Download CSV</button>
-      </div>
-      <div class="col">
-        <button class="btn btn-primary" (click)="addNewEmployee()">Add Employee</button>
-      </div>
+  <div class="row">
+
+    <!-- <div class="col">
+        <form #hoursForm="ngForm">
+        <input type="file" (change)="addHours($event.target?.files)"  [(ngModel)]="hoursFile" accept="data/xlsx, data/csv" name="file" onchange="console.log(event.target.files)"/>
+        <button >Update data</button>
+      </form>
+      </div> -->
+    <div class="dropdown col">
+      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+        (click)="showDropdown()">
+        Menu
+      </button>
+      <ul class="dropdown-menu" [ngClass]="classDropdown">
+        <li>
+          <button class="btn hover" (click)="companyDetails()">Show Company Details</button>
+        </li>
+        <li>
+          <button class="btn hover" (click)="addNewEmployee()">Add Employee</button>
+        </li>
+        <li>
+          <button class="btn hover" (click)="downloadCsv()">Download CSV</button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="input-group mb-3 col">
+      <span class="input-group-text">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchText" name="search"
+        (input)="changeSearch()">
+      <button class="input-group-text" (click)="cancel()">Cancel</button>
     </div>
   </div>
+</div>
+
+
 
 
 <table class="table">
-    <thead>
-        <tr>
-            <th></th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Address</th>
-            <th>Start Job</th>
-            <th>More info</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (employee of employeesList; track $index) {
-        <tr>
-            <td class="identity">{{ $index }}</td>
-            <td>{{ employee.firstName }}</td>
-            <td>{{ employee.lastName }}</td>
-            <td>{{ employee.address }}</td>
-            <td>{{ employee.email }}</td>
-            <td>{{ employee.startJob }}</td>
-            <td>
-                <button class="btn btn-sm btn-primary me-2" (click)="moredetails(employee.id!)">
-                    <i class="bi bi-info-circle"></i>
-                </button>
-            </td>
-        </tr>}
-    </tbody>
+  <thead>
+    <tr>
+      <th></th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+      <th>Address</th>
+      <th>Start Job</th>
+      <th>More info</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (employee of showListEmployee; track $index) {
+    <tr>
+      <td class="identity">{{ $index }}</td>
+      <td>{{ employee.firstName }}</td>
+      <td>{{ employee.lastName }}</td>
+      <td>{{ employee.address }}</td>
+      <td>{{ employee.email }}</td>
+      <td>{{ employee.startJob }}</td>
+      <td>
+        <button class="btn btn-sm btn-primary me-2" (click)="moredetails(employee.id!)">
+          <i class="bi bi-info-circle"></i>
+        </button>
+      </td>
+    </tr>}
+  </tbody>
 </table>
-
-<router-outlet></router-outlet>

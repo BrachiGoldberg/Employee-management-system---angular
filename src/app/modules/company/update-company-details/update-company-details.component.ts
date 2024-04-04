@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { Company } from '../company.model';
+import { Company } from '../models/company.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CompanyService } from '../company.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { emailValidator } from '../add-new-company/add-new-company.component';
+import { UnauthorizedError } from '../../../app.component';
 
 @Component({
   selector: 'app-update-company-details',
@@ -41,6 +42,14 @@ export class UpdateCompanyDetailsComponent {
         console.log("this is my data", data)
         this.company = data
         this.createForm()
+      },
+      error: err => {
+        if (err.status == 401)
+          UnauthorizedError()
+        else if (err.status == 404)
+          this.NotFoundPage()
+        else
+          this._router.navigate(['error'])
       }
     })
 
@@ -62,7 +71,7 @@ export class UpdateCompanyDetailsComponent {
   saveChanges() {
 
     if (this.updateForm.status == 'VALID') {
-      
+
       this.validForm = true
       let termsId = this.company.termsId
       this.company = this.updateForm.value
@@ -74,7 +83,14 @@ export class UpdateCompanyDetailsComponent {
           this._router.navigate([`company/details/${this.id}`])
         },
         error: err => {
-          console.log("there is an error", err)
+          if (err.status == 401)
+            UnauthorizedError()
+          else if (err.status == 400)
+            this.BadRequest()
+          else if (err.status == 404)
+            this.NotFoundPage()
+          else
+            this._router.navigate(['error'])
         }
       })
     }
@@ -83,5 +99,13 @@ export class UpdateCompanyDetailsComponent {
     }
   }
 
-  
+
+  NotFoundPage() {
+    this._router.navigate(['error?mess=pageNotFound'])
+  }
+
+  BadRequest() {
+    this._router.navigate(['error?mess=badRequest'])
+  }
+
 }

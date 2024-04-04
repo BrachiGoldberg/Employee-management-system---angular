@@ -4,6 +4,7 @@ import { BankAccount } from '../models/bank-account.model';
 import { EmployeeService } from '../employee.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Employee } from '../models/employee.model';
+import { UnauthorizedError, errorsEnum } from '../../../app.component';
 
 export function numbersValidator(control: AbstractControl): { [key: string]: any } | null {
   const passwordRegex = /^[\d]{1,}$/;
@@ -58,7 +59,7 @@ export class BankAccountComponent {
     })
   }
 
-  get bankControllers(){
+  get bankControllers() {
     return this.accountForm.controls
   }
 
@@ -101,7 +102,7 @@ export class BankAccountComponent {
           this.SendNewEmployee(company.id, data.id!, termsId, employee)
         },
         error: err => {
-          console.log("there is an error in created bank account", err)
+          this.errosFunction(err.status)
         }
       })
     }
@@ -116,7 +117,7 @@ export class BankAccountComponent {
         history.back()
       },
       error: err => {
-        console.log("there is an error ", err)
+        this.errosFunction(err.status)
       }
     })
   }
@@ -137,8 +138,32 @@ export class BankAccountComponent {
         this._router.navigate(["employee"])
       },
       error: err => {
-        console.log("there is an error in created new employee", err)
+        this.errosFunction(err.status)
       }
     })
+  }
+
+  errosFunction(statusCode: number) {
+    switch (statusCode) {
+      case 400:
+        this.badRequest()
+        break
+      case 401:
+        UnauthorizedError()
+        break
+      case 404:
+        this.pageNotFound()
+        break
+      default:
+        this._router.navigate(['error'])
+    }
+  }
+
+  badRequest() {
+    this._router.navigate([`error?mess=${errorsEnum.BADREQUEST}`])
+  }
+
+  pageNotFound() {
+    this._router.navigate([`error?mess=${errorsEnum.NOTFOUND}`])
   }
 }

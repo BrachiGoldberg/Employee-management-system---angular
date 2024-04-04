@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CompanyService } from '../company.service';
 import { Router } from '@angular/router';
 import { UnauthorizedError } from '../../../app.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login-to-company',
@@ -34,7 +35,10 @@ export class LoginToCompanyComponent {
         },
         error: err => {
           console.log("ERROR: ", err)
-          // this.userName = this.password = ""
+          if (err.status == 401)
+            this.massegeLoginFails()
+          else 
+            this._router.navigate(['error'])
         }
       })
 
@@ -42,5 +46,20 @@ export class LoginToCompanyComponent {
 
   togglePasswordVisibility() {
     this.passwordVisible = !this.passwordVisible;
+  }
+
+  massegeLoginFails(){
+    Swal.fire({
+      title: "Authentication failed",
+      text: "User name or password are not correct, please fix it",
+      footer: "Do you not have an account? You can create a new accoutn now!",
+      showCancelButton: true,
+      cancelButtonText: 'Create new account'
+    }).then((result) => {
+      if (result.isDismissed) {
+        this._router.navigate([`company/new-company`])
+      } else if(result.isConfirmed)
+        this.userName = this.password = ""
+    })
   }
 }

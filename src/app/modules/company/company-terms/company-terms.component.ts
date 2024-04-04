@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CompanyTerms } from '../company-terms.model';
+import { CompanyTerms } from '../models/company-terms.model';
 import { CompanyService } from '../company.service';
-import { Company } from '../company.model';
+import { Company } from '../models/company.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { UnauthorizedError } from '../../../app.component';
 
 @Component({
   selector: 'app-company-terms',
@@ -42,11 +44,7 @@ export class CompanyTermsComponent {
             this.compId = compId
         }
       })
-
-
     }
-
-
   }
 
   createForm() {
@@ -66,6 +64,7 @@ export class CompanyTermsComponent {
   get termsControlers() {
     return this.termsForm.controls
   }
+
   getCompanyTerms() {
     this._service.getCompanyTermsById(this.id!).subscribe({
       next: data => {
@@ -74,7 +73,10 @@ export class CompanyTermsComponent {
         this.createForm()
       },
       error: err => {
-        console.log("I dont have company terms", err)
+        if (err.status == 401)
+          UnauthorizedError()
+        else
+          this._router.navigate(['error'])
       }
     })
   }
@@ -87,16 +89,13 @@ export class CompanyTermsComponent {
       this.companyTerms = this.termsForm.value
       console.log("terms parameters: ", this.companyTerms)
 
-      if (this.url == "new-terms") {
+      if (this.url == "new-terms")
         this.AddNewTerms()
-      }
-      else {
+      else
         this.updateTerms()
-      }
     }
-    else {
+    else
       this.validForm = false
-    }
   }
 
   AddNewTerms() {
@@ -105,8 +104,11 @@ export class CompanyTermsComponent {
         console.log("submit succededd", data)
         this.sendNewCompany(data.id!)
       },
-      error: reg => {
-        console.log("ERROR! ", reg)
+      error: err => {
+        if (err.status == 400)
+          this.massegeOfError()
+        else
+          this._router.navigate(['error'])
       }
     })
   }
@@ -127,8 +129,11 @@ export class CompanyTermsComponent {
           sessionStorage.setItem("company", JSON.stringify(data.company))
           this._router.navigate(["employee/add-manager"])
         },
-        error: reg => {
-          console.log("ERROR!", reg)
+        error: err => {
+          if (err.status == 400)
+            this.massegeOfErrorDetails()
+          else
+            this._router.navigate(['error'])
         }
       })
     }
@@ -146,4 +151,23 @@ export class CompanyTermsComponent {
     })
   }
 
+
+  massegeOfErrorDetails() {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "It seems that the company name or username already exists in the system",
+      allowOutsideClick: true,
+      didClose: () => this._router.navigate([`company/new-company`])
+    })
+  }
+
+  massegeOfError() {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Did you enter all the required details? Please verify the integrity of the document",
+      allowOutsideClick: true,
+    })
+  }
 }

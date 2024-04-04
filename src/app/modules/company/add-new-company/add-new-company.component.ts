@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Company } from '../company.model';
+import { Company } from '../models/company.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CompanyService } from '../company.service';
+import Swal from 'sweetalert2';
+import { UnauthorizedError } from '../../../app.component';
 
 export function emailValidator(control: AbstractControl): { [key: string]: any } | null {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -72,6 +74,11 @@ export class AddNewCompanyComponent {
       },
       error: err => {
         console.log("getting company details dont want to come!!!", err)
+        if (err.status == 401)
+          UnauthorizedError()
+        else
+          this._router.navigate(['error'])
+        
       }
     })
   }
@@ -115,5 +122,13 @@ export class AddNewCompanyComponent {
     else
       this.validForm = false
   }
+
+  // massegeOfErrorDetails(){
+  //   Swal.fire({
+  //     icon: "error",
+  //     title: "Oops...",
+  //     text: "It seems that the company name or username already exists in the system",
+  //   });
+  // }
 
 }

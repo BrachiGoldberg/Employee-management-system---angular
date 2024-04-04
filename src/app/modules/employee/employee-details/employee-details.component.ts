@@ -3,6 +3,7 @@ import { EmployeeService } from '../employee.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Employee } from '../models/employee.model';
 import { Position } from '../models/position.model.';
+import { UnauthorizedError, errorsEnum } from '../../../app.component';
 
 @Component({
   selector: 'app-employee-details',
@@ -43,8 +44,8 @@ export class EmployeeDetailsComponent {
         console.log("data succedded ", data)
         this.employee = data
       },
-      error: reg => {
-        console.log("error! ", reg)
+      error: err => {
+        this.errosFunction(err.status)
       }
     })
   }
@@ -55,7 +56,7 @@ export class EmployeeDetailsComponent {
         this.allPosition = data
       },
       error: err => {
-        console.log("there is an error while getting the positions list", err)
+        this.errosFunction(err.status)
       }
     })
   }
@@ -78,10 +79,32 @@ export class EmployeeDetailsComponent {
         this._router.navigate(['employee'])
       },
       error: err => {
-        console.log("delete not worked well, something want wrang", err)
+        this.errosFunction(err.status)
       }
     })
   }
 
+  errosFunction(statusCode: number) {
+    switch (statusCode) {
+      case 400:
+        this.badRequest()
+        break
+      case 401:
+        UnauthorizedError()
+        break
+      case 404:
+        this.pageNotFound()
+        break
+      default:
+        this._router.navigate(['error'])
+    }
+  }
 
+  badRequest() {
+    this._router.navigate([`error?mess=${errorsEnum.BADREQUEST}`])
+  }
+
+  pageNotFound() {
+    this._router.navigate([`error?mess=${errorsEnum.NOTFOUND}`])
+  }
 }

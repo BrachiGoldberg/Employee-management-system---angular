@@ -6,6 +6,7 @@ import { EmployeeService } from '../employee.service';
 import { EmployeePosition, Position } from '../models/position.model.';
 import { DatePipe } from '@angular/common';
 import { emailValidator } from '../../company/add-new-company/add-new-company.component';
+import { UnauthorizedError, errorsEnum } from '../../../app.component';
 
 export function dateComparisonValidator(): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
@@ -93,13 +94,16 @@ export class AddUpdateEmployeeComponent {
               this.createForm()
             },
             error: err => {
-              console.log("there is an error: ", err)
+              this.errosFunction(err.status)
             }
           })
         }
       })
     }
+  }
 
+  pageNotFound() {
+    this._router.navigate([`error?mess=${errorsEnum.NOTFOUND}`])
   }
 
   createForm() {
@@ -136,7 +140,7 @@ export class AddUpdateEmployeeComponent {
         this.initialShowPositions()
       },
       error: err => {
-        console.log("there is an error while try getting the positons list", err)
+        this.errosFunction(err.status)
       }
     })
   }
@@ -160,7 +164,7 @@ export class AddUpdateEmployeeComponent {
               this.updatePositions()
             },
             error: err => {
-              console.log("error!", err)
+              this.errosFunction(err.status)
             }
           })
         }
@@ -168,8 +172,27 @@ export class AddUpdateEmployeeComponent {
     }
     else {
       this.validForm = false
-      console.log("no valid form",this.employeeFrom)
+      console.log("no valid form", this.employeeFrom)
     }
+  }
+  errosFunction(statusCode: number) {
+    switch (statusCode) {
+      case 400:
+        this.badRequest()
+        break
+      case 401:
+        UnauthorizedError()
+        break
+      case 404:
+        this.pageNotFound()
+        break
+      default:
+        this._router.navigate(['error'])
+    }
+  }
+
+  badRequest() {
+    this._router.navigate([`error?mess=${errorsEnum.BADREQUEST}`])
   }
 
   checksValidationDates(firstDate: string, secondDate: string): boolean {
@@ -202,7 +225,7 @@ export class AddUpdateEmployeeComponent {
         history.back()
       },
       error: err => {
-        console.log("Oops.. something want wrang", err)
+        this.errosFunction(err.status)
       }
     })
   }
@@ -224,37 +247,37 @@ export class AddUpdateEmployeeComponent {
     this._router.navigate([`employee/manager-emp-terms`])
   }
 
-  get newPositionControlers(){
+  get newPositionControlers() {
     return this.newPosForm.controls
   }
   postPosition() {
-    
+
     this.position = this.newPosForm.value
     console.log(this.position.name, this.position.isAdministrative.valueOf(), this.allPositions)
     let exists = this.allPositions.find(p => p.name == this.position.name &&
-      (p.isAdministrative && this.position.isAdministrative.valueOf() == true||
-      !p.isAdministrative && this.position.isAdministrative.valueOf() == false
+      (p.isAdministrative && this.position.isAdministrative.valueOf() == true ||
+        !p.isAdministrative && this.position.isAdministrative.valueOf() == false
       ))
-    if (this.newPosForm.status == 'VALID' && exists ) {
+    if (this.newPosForm.status == 'VALID' && exists) {
       this.validNewPosForm = false
       console.log("this positon already exists")
     }
-     else {
+    else {
       this.validNewPosForm = true
-       console.log("its a new position to add  the server")
-       this._service.addNewPosition(this.position).subscribe({
-         next: data => {
-           console.log(" I added new position", data)
+      console.log("its a new position to add  the server")
+      this._service.addNewPosition(this.position).subscribe({
+        next: data => {
+          console.log(" I added new position", data)
           this.isAbleNewPosition = false
-           this.getPostionsList()
-           this.newPosForm.reset()
-         },
-         error: err => {
-           console.log("there is an error post new position", err)
-           this.isAbleNewPosition = false
-         }
-       })
-     }
+          this.getPostionsList()
+          this.newPosForm.reset()
+        },
+        error: err => {
+          this.errosFunction(err.status)
+          this.isAbleNewPosition = false
+        }
+      })
+    }
   }
 
   removeEmp() {
@@ -264,7 +287,7 @@ export class AddUpdateEmployeeComponent {
         this._router.navigate(['employee'])
       },
       error: err => {
-        console.log("delete not worked well, something want wrang", err)
+        this.errosFunction(err.status)
       }
     })
   }

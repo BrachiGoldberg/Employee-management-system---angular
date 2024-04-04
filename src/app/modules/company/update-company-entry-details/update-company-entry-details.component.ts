@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CompanyService } from '../company.service';
 import { passwordValidator } from '../add-new-company/add-new-company.component';
+import { UnauthorizedError, errorsEnum } from '../../../app.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-update-company-entry-details',
@@ -58,16 +60,39 @@ export class UpdateCompanyEntryDetailsComponent {
       console.log("the form is valid")
       this.entryDetails = this.entryForm.value
       this._service.updateCompanyEntryDetails(this.compId, this.entryDetails.userName, this.entryDetails.password)
-      .subscribe({
-        next: data => {
-          console.log("I update secret details", data)
-          this._router.navigate([`company/details/${this.compId}`])
-        }
-      })
+        .subscribe({
+          next: data => {
+            console.log("I update secret details", data)
+            this._router.navigate([`company/details/${this.compId}`])
+          },
+          error: err => {
+            if (err.status == 401)
+              UnauthorizedError()
+            else if (err.status == 400)
+              this.BadRequest()
+            else if (err.status == 404)
+              this.PageNotFound()
+            else
+              this._router.navigate(['error'])
+          }
+        })
     }
     else {
       this.validForm = false
     }
+  }
+
+  BadRequest() {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "It's seems there is an error, Please verify the integrity of the document",
+      allowOutsideClick: true,
+    })
+  }
+
+  PageNotFound() {
+    this._router.navigate([`error?mess=${errorsEnum.NOTFOUND}`])
   }
 }
 

@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { CompanyService } from '../company.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Company } from '../company.model';
+import { Company } from '../models/company.model';
+import { UnauthorizedError } from '../../../app.component';
 
 @Component({
   selector: 'app-company-details',
@@ -36,21 +37,24 @@ export class CompanyDetailsComponent {
         this.company = data
       },
       error: err => {
-        console.log("there is an error", err)
+        if (err.status == 401)
+          UnauthorizedError()
+        else
+          this._router.navigate(['error'])
       }
     })
   }
 
-  updateCompany(){
+  updateCompany() {
     this._router.navigate([`company/update-company/${this.id}`])
   }
 
-  updateTerms(){
+  updateTerms() {
     this._router.navigate([`company/comp-id/${this.id}/update-terms/${this.company!.termsId}`])
   }
 
-  updateEntryDetails(){
-    let entry = {userName: this.company?.userName, password: this.company?.password}
+  updateEntryDetails() {
+    let entry = { userName: this.company?.userName, password: this.company?.password }
     sessionStorage.setItem('entryDetails', JSON.stringify(entry))
     this._router.navigate([`company/comp-id/${this.id}/update-entry-details`])
   }
