@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Employee, EmployeePostModel } from './models/employee.model';
 import { EmployeePosition, Position } from './models/position.model.';
-import { EmployeeTerms } from './employee-terms.model';
+import { EmployeeTerms } from './models/employee-terms.model';
 import { BankAccount } from './models/bank-account.model';
 import { map } from 'rxjs/operators';
 
@@ -43,7 +43,6 @@ export class EmployeeService {
   //good!
   removeEmployeeFromCompany(empId: number): Observable<Employee> {
     let token = this.getTokenBearer()
-    console.log("my token remove function in service", token)
     return this._http.put<Employee>(`${baseUrl}/Employee/delete/emp-id/${empId}`, {}, { headers: { "Authorization": `Bearer ${token}` } })
   }
 
@@ -119,7 +118,6 @@ export class EmployeeService {
   //---------------- Employee Terms --------------------
   addEmployeeTerms(terms: EmployeeTerms): Observable<EmployeeTerms> {
     let token = this.getTokenBearer()
-    console.log("this is the new terms ", terms)
     return this._http.post<EmployeeTerms>(`${baseUrl}/EmployeeTerms`, {
       hourlyWage: terms.hourlyWage ? terms.hourlyWage : 0,
       overtimePay: terms.overtimePay ? terms.overtimePay : 0,

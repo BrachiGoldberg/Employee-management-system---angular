@@ -5,6 +5,7 @@ import { EmployeeService } from '../employee.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Employee } from '../models/employee.model';
 import { UnauthorizedError, errorsEnum } from '../../../app.component';
+import Swal from 'sweetalert2';
 
 export function numbersValidator(control: AbstractControl): { [key: string]: any } | null {
   const passwordRegex = /^[\d]{1,}$/;
@@ -36,17 +37,14 @@ export class BankAccountComponent {
       if (this.bankId)
         this._service.getBankById(this.bankId).subscribe({
           next: data => {
-            console.log("I got bank details", data)
             this.bankAccount = data
             this.createForm()
           },
           error: err => {
-            console.log("there is an error , I couldnt get the bank details", err)
+            this.errosFunction(err.status)
           }
         })
-
     }
-
     this.createForm()
 
   }
@@ -67,7 +65,6 @@ export class BankAccountComponent {
     if (this.accountForm.status == 'VALID') {
       this.validForm = true
       this.bankAccount = this.accountForm.value
-      console.log("bank account details: ", this.bankAccount, this.url)
       if (this.url == 'update-account-b')
         this.updateAccount()
       else if (this.url == "new-account-b" || "manager-account-b") {
@@ -97,8 +94,6 @@ export class BankAccountComponent {
 
       this._service.addBankAccount(this.bankAccount).subscribe({
         next: data => {
-          console.log("added account bank to manager well done!", data)
-          console.log("now I need to add the manger details, please wait...")
           this.SendNewEmployee(company.id, data.id!, termsId, employee)
         },
         error: err => {
@@ -109,11 +104,15 @@ export class BankAccountComponent {
   }
 
   updateAccount() {
-    console.log("the details updated")
-
     this._service.updateAccount(this.bankId!, this.bankAccount).subscribe({
-      next: data => {
-        console.log("the details updated", data)
+      next: () => {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "The bank account has been successfully update",
+          showConfirmButton: false,
+          timer: 1500
+        });
         history.back()
       },
       error: err => {
@@ -126,8 +125,14 @@ export class BankAccountComponent {
   SendNewEmployee(companyId: number, bankId: number, termsId: number, employee: Employee) {
 
     this._service.addNewEmployee(companyId, employee, termsId, bankId).subscribe({
-      next: data => {
-        console.log("new employee added!", data)
+      next: () => {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "The employee has been successfully added",
+          showConfirmButton: false,
+          timer: 1500
+        });
         let company = sessionStorage.getItem("company")
         let token = sessionStorage.getItem("token")
         sessionStorage.clear()

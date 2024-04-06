@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { EmployeeTerms } from '../employee-terms.model';
+import { EmployeeTerms } from '../models/employee-terms.model';
 import { EmployeeService } from '../employee.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UnauthorizedError, errorsEnum } from '../../../app.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-employee-terms',
@@ -47,12 +48,11 @@ export class EmployeeTermsComponent {
   getTermsById() {
     this._service.getEmpTermsById(this.termsId!).subscribe({
       next: data => {
-        console.log("I got the employee terms from the server", data)
         this.terms = data
         this.createForm()
       },
       error: err => {
-        console.log("I have an error", err)
+        this.errosFunction(err.status)
       }
     })
   }
@@ -67,7 +67,6 @@ export class EmployeeTermsComponent {
     else {
       this._service.addEmployeeTerms(this.terms).subscribe({
         next: data => {
-          console.log("data comes for me!!!! its so fine--)", data)
           sessionStorage.setItem("empTermsId", JSON.stringify(data.id))
           if (this.url == 'manager-emp-terms')
             this._router.navigate(['employee/manager-account-b'])

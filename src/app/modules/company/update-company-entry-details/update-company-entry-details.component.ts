@@ -57,12 +57,17 @@ export class UpdateCompanyEntryDetailsComponent {
   saveChanges() {
     if (this.entryForm.status == 'VALID') {
       this.validForm = true
-      console.log("the form is valid")
       this.entryDetails = this.entryForm.value
       this._service.updateCompanyEntryDetails(this.compId, this.entryDetails.userName, this.entryDetails.password)
         .subscribe({
-          next: data => {
-            console.log("I update secret details", data)
+          next: () => {
+            Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "The changes were successfully saved",
+              showConfirmButton: false,
+              timer: 1500
+            });
             this._router.navigate([`company/details/${this.compId}`])
           },
           error: err => {

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Employee } from '../models/employee.model';
 import { Position } from '../models/position.model.';
 import { UnauthorizedError, errorsEnum } from '../../../app.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-employee-details',
@@ -19,29 +20,18 @@ export class EmployeeDetailsComponent {
   constructor(private _service: EmployeeService, private _router: Router, private _activated: ActivatedRoute) { }
 
   ngOnInit() {
-
-    // let compId = sessionStorage.getItem('companyId')
-    // if (compId != undefined) {
-    //   this.companyId = +compId
-    // }
     this.getPositionsList()
 
     this._activated.params.subscribe({
       next: params => {
         this.empId = params['id']
-        console.log("id params is: ", this.empId)
         this.getEmployeeDetails()
-      },
-      error: err => {
-        console.log("error in employee-details-component get params from url", err)
-      }
-    })
+      }})
   }
 
   getEmployeeDetails() {
     this._service.getEmployee(this.empId).subscribe({
       next: data => {
-        console.log("data succedded ", data)
         this.employee = data
       },
       error: err => {
@@ -73,15 +63,32 @@ export class EmployeeDetailsComponent {
   }
 
   removeEmp() {
-    this._service.removeEmployeeFromCompany(this.empId).subscribe({
-      next: data => {
-        console.log("data worked well", data)
-        this._router.navigate(['employee'])
-      },
-      error: err => {
-        this.errosFunction(err.status)
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, I want remove employee!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this._service.removeEmployeeFromCompany(this.empId).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Deleted!",
+              text: "The employee has been deleted.",
+              icon: "success"
+            });
+            this._router.navigate(['employee'])
+          },
+          error: err => {
+            this.errosFunction(err.status)
+          }
+        })
       }
     })
+    
   }
 
   errosFunction(statusCode: number) {

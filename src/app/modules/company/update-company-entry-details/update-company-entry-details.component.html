@@ -7,14 +7,14 @@
 
                 <div class="mb-3">
                     <label for="userName" class="form-label">Company UserName</label>
-                    <input id="userName" formControlName="userName" name="userName" class="form-control"/>
+                    <input id="userName" formControlName="userName" name="userName" class="form-control" />
                     @if (!validForm &&entryFormControls['userName'].errors) {
                     <span class="text-danger">User name is required</span>
                     }
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Company Password</label>
-                    <input id="password" formControlName="password" name="password" class="form-control"/>
+                    <input id="password" formControlName="password" name="password" class="form-control" />
                     @if (!validForm &&entryFormControls['password'].errors) {
                     @if(entryFormControls['password'].errors['required']){
                     <span class="text-danger">Password is required</span>

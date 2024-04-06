@@ -33,7 +33,6 @@ export class CompanyDetailsComponent {
   getCompanyDetails() {
     this._service.getCompanyById(this.id).subscribe({
       next: data => {
-        console.log(" i got the data", data)
         this.company = data
       },
       error: err => {

@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { EmployeeService } from '../employee.service';
 import { Employee } from '../models/employee.model';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
 import { UnauthorizedError, errorsEnum } from '../../../app.component';
 
 @Component({
@@ -25,15 +24,14 @@ export class EmployeesListComponent {
     let myCompany = sessionStorage.getItem("company")
     if (myCompany) {
       this.companyId = +JSON.parse(myCompany).id
-      this.getEmployees(this.companyId)
+      this.getEmployees()
     }
   }
 
-  getEmployees(companyId: number) {
+  getEmployees() {
 
     this._service.getAllEmployeesByCompanyId(this.companyId!).subscribe({
       next: data => {
-        console.log("all employees got", data)
         this.employeesList = data
         this.showListEmployee = data
       },
@@ -69,7 +67,6 @@ export class EmployeesListComponent {
   }
 
   moredetails(empId: number) {
-    console.log("employee id is: ", empId)
     this._router.navigate(['employee/emp-id', empId])
 
   }
@@ -98,7 +95,6 @@ export class EmployeesListComponent {
   }
 
   changeSearch() {
-    console.log("now its changed by input", this.searchText)
     this.filter()
   }
   cancel() {
@@ -114,7 +110,6 @@ export class EmployeesListComponent {
       e.address?.toLowerCase().includes(this.searchText.toLowerCase()) ||
       e.email?.toLowerCase().includes(this.searchText.toLowerCase()))
 
-    console.log("the show list", this.showListEmployee)
   }
 
   showDropdown() {
@@ -126,17 +121,6 @@ export class EmployeesListComponent {
 
   addHours(data: any) {
 
-    console.log("data accept: ", data)
     const file: File = data?.target?.files
-    // if (file) {
-
-    //   // this.fileName = file.name;
-
-    //   const formData = new FormData();
-
-    //   formData.append("thumbnail", file);
-    //   console.log("form data", formData)
-    // }
-
   }
 }

@@ -8,8 +8,8 @@ import { CompanyService } from './company.service';
 import { RouterOutlet } from '@angular/router';
 import { EmployeeModule } from '../employee/employee.module';
 import { CompanyTermsComponent } from './company-terms/company-terms.component';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthService } from './auth.service';
+// import { HTTP_INTERCEPTORS } from '@angular/common/http';
+// import { AuthService } from './auth.service';
 import { CompanyDetailsComponent } from './company-details/company-details.component';
 import { UpdateCompanyDetailsComponent } from './update-company-details/update-company-details.component';
 import { UpdateCompanyEntryDetailsComponent } from './update-company-entry-details/update-company-entry-details.component';
@@ -34,11 +34,11 @@ import { UpdateCompanyEntryDetailsComponent } from './update-company-entry-detai
     EmployeeModule
   ],
   providers: [CompanyService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthService,
-      multi: true,
-    },
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: AuthService,
+    //   multi: true,
+    // },
   ]
 })
 export class CompanyModule { }

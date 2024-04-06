@@ -7,6 +7,7 @@ import { EmployeePosition, Position } from '../models/position.model.';
 import { DatePipe } from '@angular/common';
 import { emailValidator } from '../../company/add-new-company/add-new-company.component';
 import { UnauthorizedError, errorsEnum } from '../../../app.component';
+import Swal from 'sweetalert2';
 
 export function dateComparisonValidator(): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
@@ -89,7 +90,6 @@ export class AddUpdateEmployeeComponent {
             next: data => {
               this.employee = data
               this.empPositions = data.positions
-              console.log("why I dont see the identity property?", this.employee)
               this.initialShowPositions()
               this.createForm()
             },
@@ -135,7 +135,6 @@ export class AddUpdateEmployeeComponent {
   getPostionsList() {
     this._service.getPositions().subscribe({
       next: data => {
-        console.log("I got all the position from the server", data)
         this.allPositions = data
         this.initialShowPositions()
       },
@@ -159,8 +158,7 @@ export class AddUpdateEmployeeComponent {
         }
         else {
           this._service.updateEmployee(this.empId, this.employee).subscribe({
-            next: data => {
-              console.log("the employee updated succesfull, ", data)
+            next: () => {
               this.updatePositions()
             },
             error: err => {
@@ -172,7 +170,6 @@ export class AddUpdateEmployeeComponent {
     }
     else {
       this.validForm = false
-      console.log("no valid form", this.employeeFrom)
     }
   }
   errosFunction(statusCode: number) {
@@ -218,10 +215,15 @@ export class AddUpdateEmployeeComponent {
 
 
   updatePositions() {
-    console.log("employee positions ", this.empPositions)
     this._service.updatePositions(this.empId!, this.empPositions).subscribe({
-      next: data => {
-        console.log("positons updates", data)
+      next: () => {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "The employee has been successfully update",
+          showConfirmButton: false,
+          timer: 1500
+        });
         history.back()
       },
       error: err => {
@@ -253,7 +255,6 @@ export class AddUpdateEmployeeComponent {
   postPosition() {
 
     this.position = this.newPosForm.value
-    console.log(this.position.name, this.position.isAdministrative.valueOf(), this.allPositions)
     let exists = this.allPositions.find(p => p.name == this.position.name &&
       (p.isAdministrative && this.position.isAdministrative.valueOf() == true ||
         !p.isAdministrative && this.position.isAdministrative.valueOf() == false
@@ -264,10 +265,8 @@ export class AddUpdateEmployeeComponent {
     }
     else {
       this.validNewPosForm = true
-      console.log("its a new position to add  the server")
       this._service.addNewPosition(this.position).subscribe({
-        next: data => {
-          console.log(" I added new position", data)
+        next: () => {
           this.isAbleNewPosition = false
           this.getPostionsList()
           this.newPosForm.reset()
@@ -281,15 +280,33 @@ export class AddUpdateEmployeeComponent {
   }
 
   removeEmp() {
-    this._service.removeEmployeeFromCompany(this.employee.id!).subscribe({
-      next: data => {
-        console.log("data worked well", data)
-        this._router.navigate(['employee'])
-      },
-      error: err => {
-        this.errosFunction(err.status)
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, I want remove employee!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this._service.removeEmployeeFromCompany(this.employee.id!).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Deleted!",
+              text: "The employee has been deleted.",
+              icon: "success"
+            });
+            this._router.navigate(['employee'])
+          },
+          error: err => {
+            this.errosFunction(err.status)
+          }
+        })
+        
       }
-    })
+    });
+    
   }
 
   updateTerms() {
@@ -313,12 +330,10 @@ export class AddUpdateEmployeeComponent {
   }
 
   removePosition(index: number) {
-    console.log("pos index", index)
     let posIndex = this.empPositions.findIndex(p => p.positionId == index)
     if (posIndex != -1) {
       this.empPositions.splice(posIndex, 1)
     }
-    console.log("pos index", posIndex)
     this.initialShowPositions()
   }
 

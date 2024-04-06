@@ -6,7 +6,7 @@ import { EmployeeDetailsComponent } from './employee-details/employee-details.co
 import { EmployeesListComponent } from './employees-list/employees-list.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthService } from '../company/auth.service';
+// import { AuthService } from '../company/auth.service';
 import { EmployeeService } from './employee.service';
 import { EmployeeTermsComponent } from './employee-terms/employee-terms.component';
 import { BankAccountComponent } from './bank-account/bank-account.component';

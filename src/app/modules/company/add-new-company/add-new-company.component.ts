@@ -57,7 +57,6 @@ export class AddNewCompanyComponent {
           let id = data['id']
           if (id) {
             this.companyId = id
-            console.log('I get the id', this.companyId)
             this.getCompany()
           }
         }
@@ -69,11 +68,9 @@ export class AddNewCompanyComponent {
     this._service.getCompanyById(this.companyId!).subscribe({
       next: data => {
         this.company = data
-        console.log("I get the company details", data, this.company.name)
         this.createForm()
       },
       error: err => {
-        console.log("getting company details dont want to come!!!", err)
         if (err.status == 401)
           UnauthorizedError()
         else
@@ -102,10 +99,8 @@ export class AddNewCompanyComponent {
 
   register() {
 
-    console.log(this.registerFormControls['email'])
     if (this.comopanyForm.status == 'VALID') {
       this.validForm = true
-      console.log("the form is ok")
 
       this.company.name = this.comopanyForm.value.name
       this.company.description = this.comopanyForm.value.description
@@ -114,7 +109,6 @@ export class AddNewCompanyComponent {
       this.company.userName = this.comopanyForm.value.userName
       this.company.password = this.comopanyForm.value.password
       this.managerIdentity = this.comopanyForm.value.managerIdentity
-      console.log("the new comapny details are: ", this.company)
       sessionStorage.setItem('new-comp', JSON.stringify(this.company))
       sessionStorage.setItem('managerId', this.managerIdentity!.toString())
       this._router.navigate(['company/new-terms'])
@@ -123,12 +117,5 @@ export class AddNewCompanyComponent {
       this.validForm = false
   }
 
-  // massegeOfErrorDetails(){
-  //   Swal.fire({
-  //     icon: "error",
-  //     title: "Oops...",
-  //     text: "It seems that the company name or username already exists in the system",
-  //   });
-  // }
 
 }

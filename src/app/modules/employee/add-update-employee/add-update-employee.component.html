@@ -90,8 +90,7 @@
                         }
                         <ul class="list-group">
                             @for (position of showPositions; track $index) {
-                            <li
-                                class="list-group-item d-flex justify-content-between align-items-center">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <span>name: {{ position.name }}</span>
                                     <span *ngIf="position.isAdministrative" class="ms-2">(Administrative)</span>

@@ -23,14 +23,12 @@ export class CompanyService {
 
   //good!
   loginToCompany(password: string | undefined, userName: string | undefined): Observable<any> {
-    console.log("login comapny success", userName, password)
     return this._http.post<any>(`${baseUrl}/Auth/login`,
       { userName: userName, password: password })
   }
 
   addNewCompany(newCompany: Company, termsId: number): Observable<any> {
     let token = this.getTokenBearer()
-    console.log("add new company: ", newCompany, termsId)
     return this._http.post(`${baseUrl}/Auth/register?termsId=${termsId}`, {
       name: newCompany.name,
       description: newCompany.description,
@@ -68,7 +66,6 @@ export class CompanyService {
   //-------------------- Company Terms ------------------------
   addCompanyTerms(terms: CompanyTerms): Observable<CompanyTerms> {
     let token = this.getTokenBearer()
-    console.log("add company terms", terms)
     return this._http.post<CompanyTerms>(`${baseUrl}/CompanyTerms`, {
       meals: terms.meals? terms.meals: 0,
       nightShiftPrecent: terms.nightShiftPrecent? terms.nightShiftPrecent: 0,

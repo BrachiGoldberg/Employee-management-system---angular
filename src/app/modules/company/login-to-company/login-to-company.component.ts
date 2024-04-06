@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CompanyService } from '../company.service';
 import { Router } from '@angular/router';
-import { UnauthorizedError } from '../../../app.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -23,21 +22,35 @@ export class LoginToCompanyComponent {
   }
 
   login() {
-    console.log("submit function", this.userName, this.password)
     this._service.loginToCompany(this.password, this.userName)
       .subscribe({
         next: data => {
-          console.log(data)
+          let timerInterval: any
+          Swal.fire({
+            position: "top-end",
+            title: "You've logged in successfully",
+            timer: 2000,
+            timerProgressBar: true,
+            showCloseButton: false,
+            didOpen: () => {
+              const timer = Swal.getPopup()!.querySelector("b");
+              timerInterval = setInterval(() => {
+                timer!.textContent = `${Swal.getTimerLeft()}`;
+              }, 100);
+            },
+            willClose: () => {
+              clearInterval(timerInterval);
+            }
+          })
           sessionStorage.setItem("token", data.token)
           sessionStorage.setItem("company", JSON.stringify(data.company))
           this._router.navigate(["employee"])
 
         },
         error: err => {
-          console.log("ERROR: ", err)
           if (err.status == 401)
             this.massegeLoginFails()
-          else 
+          else
             this._router.navigate(['error'])
         }
       })
@@ -48,7 +61,7 @@ export class LoginToCompanyComponent {
     this.passwordVisible = !this.passwordVisible;
   }
 
-  massegeLoginFails(){
+  massegeLoginFails() {
     Swal.fire({
       title: "Authentication failed",
       text: "User name or password are not correct, please fix it",
@@ -58,7 +71,7 @@ export class LoginToCompanyComponent {
     }).then((result) => {
       if (result.isDismissed) {
         this._router.navigate([`company/new-company`])
-      } else if(result.isConfirmed)
+      } else if (result.isConfirmed)
         this.userName = this.password = ""
     })
   }

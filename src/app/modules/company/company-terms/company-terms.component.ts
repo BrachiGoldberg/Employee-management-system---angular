@@ -5,7 +5,7 @@ import { CompanyService } from '../company.service';
 import { Company } from '../models/company.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
-import { UnauthorizedError } from '../../../app.component';
+import { UnauthorizedError, errorsEnum } from '../../../app.component';
 
 @Component({
   selector: 'app-company-terms',
@@ -68,7 +68,6 @@ export class CompanyTermsComponent {
   getCompanyTerms() {
     this._service.getCompanyTermsById(this.id!).subscribe({
       next: data => {
-        console.log("company terms", data)
         this.companyTerms = data
         this.createForm()
       },
@@ -87,7 +86,6 @@ export class CompanyTermsComponent {
     if (this.termsForm.status == 'VALID') {
       this.validForm = true
       this.companyTerms = this.termsForm.value
-      console.log("terms parameters: ", this.companyTerms)
 
       if (this.url == "new-terms")
         this.AddNewTerms()
@@ -101,7 +99,6 @@ export class CompanyTermsComponent {
   AddNewTerms() {
     this._service.addCompanyTerms(this.companyTerms).subscribe({
       next: data => {
-        console.log("submit succededd", data)
         this.sendNewCompany(data.id!)
       },
       error: err => {
@@ -123,8 +120,13 @@ export class CompanyTermsComponent {
 
       this._service.addNewCompany(myCompany, termsId).subscribe({
         next: data => {
-          console.log("data succeedded", data)
-          console.log("now I have new Comapny, please check if it correct!")
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "The company has been successfully added",
+            showConfirmButton: false,
+            timer: 1500
+          });
           sessionStorage.setItem("token", data.token)
           sessionStorage.setItem("company", JSON.stringify(data.company))
           this._router.navigate(["employee/add-manager"])
@@ -138,19 +140,51 @@ export class CompanyTermsComponent {
       })
     }
     else
-      console.log("there is an error, please check all the details are correct")
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "there is an error, please check all the details are correct",
+        allowOutsideClick: true,
+      })
 
   }
 
   updateTerms() {
     this._service.updateCompanyTerms(this.id!, this.companyTerms).subscribe({
-      next: data => {
-        console.log("thils.is my data from server", data)
+      next: () => {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "The changes were successfully saved",
+          showConfirmButton: false,
+          timer: 1500
+        });
         this._router.navigate([`company/details/${this.compId}`])
+      },
+      error: err => {
+        if (err.status == 401)
+          UnauthorizedError()
+        else if (err.status == 404)
+          this.notFound()
+        else if (err.status == 400)
+          this.badRequest()
       }
     })
   }
 
+
+  notFound() {
+    this._router.navigate([`error?mess=${errorsEnum.NOTFOUND}`])
+  }
+
+  badRequest() {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "It looks like something is wrong with your request, please try again",
+      allowOutsideClick: true,
+    })
+  }
 
   massegeOfErrorDetails() {
     Swal.fire({

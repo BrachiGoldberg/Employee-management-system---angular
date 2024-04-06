@@ -5,6 +5,7 @@ import { CompanyService } from '../company.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { emailValidator } from '../add-new-company/add-new-company.component';
 import { UnauthorizedError } from '../../../app.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-update-company-details',
@@ -39,7 +40,6 @@ export class UpdateCompanyDetailsComponent {
   getCompany() {
     this._service.getCompanyById(this.id).subscribe({
       next: data => {
-        console.log("this is my data", data)
         this.company = data
         this.createForm()
       },
@@ -76,10 +76,15 @@ export class UpdateCompanyDetailsComponent {
       let termsId = this.company.termsId
       this.company = this.updateForm.value
       this.company.termsId = termsId
-      console.log("this is the update details: ", this.company)
       this._service.updateCompany(this.id, this.company).subscribe({
-        next: data => {
-          console.log("update is success", data)
+        next: () => {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "The changes were successfully saved",
+            showConfirmButton: false,
+            timer: 1500
+          });
           this._router.navigate([`company/details/${this.id}`])
         },
         error: err => {
