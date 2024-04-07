@@ -5,7 +5,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { EmployeeService } from '../employee.service';
 import { EmployeePosition, Position } from '../models/position.model.';
 import { DatePipe } from '@angular/common';
-import { emailValidator } from '../../company/add-new-company/add-new-company.component';
+import { emailValidator, identityValidator } from '../../company/add-new-company/add-new-company.component';
 import { UnauthorizedError, errorsEnum } from '../../../app.component';
 import Swal from 'sweetalert2';
 
@@ -13,16 +13,13 @@ export function dateComparisonValidator(): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const birthDateControl = formGroup.get('birthDate');
     const startJobControl = formGroup.get('startJob');
-
     if (birthDateControl && startJobControl) {
       const birthDate = new Date(birthDateControl.value);
       const startJob = new Date(startJobControl.value);
-
       if (startJob < birthDate) {
         return { 'dateComparison': true };
       }
     }
-
     return null;
   };
 }
@@ -34,31 +31,33 @@ export function dateComparisonValidator(): ValidatorFn {
 })
 export class AddUpdateEmployeeComponent {
 
-
   url: string | undefined
-  employee: Employee = new Employee()
-  employeeFrom: FormGroup | undefined
   empId: number | undefined
   isUpdateStatus: boolean = false
   isManagerAdded: boolean = false
-  allPositions: Position[] = []
-  empPositions: EmployeePosition[] = []
-  showPositions: Position[] = []
-  // ableDate: boolean = false
-  posForm: FormGroup = new FormGroup({ 'date': new FormControl(new Date()) })
-  position: Position = new Position()
-  newPosForm: FormGroup = new FormGroup({
-    "name": new FormControl(this.position.name, Validators.required),
-    "isAdministrative": new FormControl(this.position.isAdministrative ? this.position.isAdministrative : false)
-  })
+
+  //-------- properties to the centeral Form - Employee details --------
+  employeeFrom: FormGroup | undefined
   validForm: boolean = true
-  isAbleNewPosition: boolean = false
+  employee: Employee = new Employee()
+
+  //-------- properties to the positions' list --------
+  allPositions: Position[] = []
+  showPositions: Position[] = []
   isAbleListPositions: boolean = false
+
+  //-------- properties related to edit employee's positions --------
+  empPositions: EmployeePosition[] = []
+  //-------- properties related to add position to employee --------
+  posForm: FormGroup | undefined
+  validPosForm: boolean = true
+  isAbleNewPosition: boolean = false
   isShowDateField: boolean = false
   positionIdSelected: number | undefined
-  validPosForm: boolean = true
-  validNewPosForm: boolean = true
 
+  //-------- properties related to add new position --------
+  position: Position = new Position()
+  validNewPosForm: boolean = true
 
   constructor(private _activated: ActivatedRoute, private _router: Router,
     private _service: EmployeeService, private _fb: FormBuilder, private _datePipe: DatePipe) { }
@@ -66,6 +65,8 @@ export class AddUpdateEmployeeComponent {
 
   ngOnInit() {
     this.createForm()
+    this.createPositionForm()
+
     this._activated.url.subscribe(data => this.url = data[0].path)
     this.getPostionsList()
 
@@ -86,29 +87,16 @@ export class AddUpdateEmployeeComponent {
         this.empId = params['id']
 
         if (this.empId) {
-          this._service.getEmployee(this.empId).subscribe({
-            next: data => {
-              this.employee = data
-              this.empPositions = data.positions
-              this.initialShowPositions()
-              this.createForm()
-            },
-            error: err => {
-              this.errosFunction(err.status)
-            }
-          })
+          this.getEmployeeById()
         }
       })
     }
   }
 
-  pageNotFound() {
-    this._router.navigate([`error?mess=${errorsEnum.NOTFOUND}`])
-  }
-
+  //-------- create forms and validation ----------
   createForm() {
     this.employeeFrom = this._fb.group({
-      identity: [{ value: this.employee.identity, disabled: this.isUpdateStatus || this.isManagerAdded }, Validators.required],
+      identity: [{ value: this.employee.identity, disabled: this.isUpdateStatus || this.isManagerAdded }, [Validators.required, identityValidator]],
       lastName: [this.employee.lastName, Validators.required],
       firstName: [this.employee.firstName, Validators.required],
       address: [this.employee.address, Validators.required],
@@ -119,34 +107,46 @@ export class AddUpdateEmployeeComponent {
       isMale: [{ value: this.employee.isMale, disabled: this.isUpdateStatus }, Validators.required],
       startJob: [{ value: this._datePipe.transform(this.employee.startJob, 'yyyy-MM-dd'), disabled: this.isUpdateStatus },
       Validators.required],
+      positons: this._fb.array([])
     })
   }
 
-
-
-
-  getPositionName(id: number) {
-    let pos = this.allPositions.find(p => p.id == id)
-    if (pos)
-      return pos.name
-    return null
+  createPositionForm() {
+    this.posForm = this._fb.group({
+      date: [new Date()],
+      isAdmin: [false]
+    })
   }
 
-  getPostionsList() {
-    this._service.getPositions().subscribe({
-      next: data => {
-        this.allPositions = data
-        this.initialShowPositions()
-      },
-      error: err => {
-        this.errosFunction(err.status)
+  checksValidationDates(firstDate: string, secondDate: string): boolean {
+    let date
+    if (firstDate == 'date')
+      date = this.posForm!.get(firstDate)
+    else
+      date = this.employeeFrom!.get(firstDate)
+    const firstDateControl = date
+    const secondDateControl = this.employeeFrom!.get(secondDate)
+    if (firstDateControl && secondDateControl) {
+      const firstDate = new Date(firstDateControl.value)
+      const secondDate = new Date(secondDateControl.value)
+
+      if (secondDate > firstDate) {
+        return false
       }
-    })
+      return true
+    }
+    return false
+  }
+
+  get formControl() {
+    return this.employeeFrom!.controls
   }
 
 
+  //--------- function related to saving changes ---------
   save() {
-    if (this.employeeFrom!.status == 'VALID') {
+    console.log(this.employeeFrom)
+    if (this.employeeFrom!.status != 'INVALID') {
       this.validForm = this.checksValidationDates('startJob', 'birthDate')
 
       if (this.validForm == true) {
@@ -172,47 +172,23 @@ export class AddUpdateEmployeeComponent {
       this.validForm = false
     }
   }
-  errosFunction(statusCode: number) {
-    switch (statusCode) {
-      case 400:
-        this.badRequest()
-        break
-      case 401:
-        UnauthorizedError()
-        break
-      case 404:
-        this.pageNotFound()
-        break
-      default:
-        this._router.navigate(['error'])
-    }
-  }
 
-  badRequest() {
-    this._router.navigate([`error?mess=${errorsEnum.BADREQUEST}`])
-  }
-
-  checksValidationDates(firstDate: string, secondDate: string): boolean {
-    let date
-    if (firstDate == 'date')
-      date = this.posForm!.get(firstDate)
-    else
-      date = this.employeeFrom!.get(firstDate)
-    const firstDateControl = date
-    const secondDateControl = this.employeeFrom!.get(secondDate)
-    if (firstDateControl && secondDateControl) {
-      const firstDate = new Date(firstDateControl.value)
-      const secondDate = new Date(secondDateControl.value)
-
-      if (secondDate > firstDate) {
-        return false
-      }
-      return true
-    }
-    return false
+  addNewEmployee() {
+    this.employee = this.employeeFrom!.value
+    this.employee.positions = this.empPositions
+    sessionStorage.setItem("new-emp", JSON.stringify(this.employee))
+    this._router.navigate([`employee/new-emp-terms`])
 
   }
 
+  addManager() {
+    let id = this.employee.identity
+    this.employee = this.employeeFrom!.value
+    this.employee.positions = this.empPositions
+    this.employee.identity = id
+    sessionStorage.setItem("new-emp", JSON.stringify(this.employee))
+    this._router.navigate([`employee/manager-emp-terms`])
+  }
 
   updatePositions() {
     this._service.updatePositions(this.empId!, this.empPositions).subscribe({
@@ -232,34 +208,99 @@ export class AddUpdateEmployeeComponent {
     })
   }
 
-  addNewEmployee() {
-    this.employee = this.employeeFrom!.value
-    this.employee.positions = this.empPositions
-    sessionStorage.setItem("new-emp", JSON.stringify(this.employee))
-    this._router.navigate([`employee/new-emp-terms`])
-
+  getEmployeeById() {
+    this._service.getEmployee(this.empId!).subscribe({
+      next: data => {
+        this.employee = data
+        this.empPositions = data.positions
+        this.initialShowPositions()
+        this.createForm()
+      },
+      error: err => {
+        this.errosFunction(err.status)
+      }
+    })
   }
 
-  addManager() {
-    let id = this.employee.identity
-    this.employee = this.employeeFrom!.value
-    this.employee.positions = this.empPositions
-    this.employee.identity = id
-    sessionStorage.setItem("new-emp", JSON.stringify(this.employee))
-    this._router.navigate([`employee/manager-emp-terms`])
+
+  //--------- function are related to positions list --------------
+  getPostionsList() {
+    this._service.getPositions().subscribe({
+      next: data => {
+        this.allPositions = data
+        this.initialShowPositions()
+      },
+      error: err => {
+        this.errosFunction(err.status)
+      }
+    })
   }
 
-  get newPositionControlers() {
-    return this.newPosForm.controls
+  initialShowPositions() {
+    this.showPositions = this.allPositions.filter(p =>
+      !this.empPositions.find(ep => ep.positionId == p.id)
+    )
   }
+
+  getPositionName(id: number) {
+    let pos = this.allPositions.find(p => p.id == id)
+    if (pos)
+      return pos.name
+    return null
+  }
+
+  changeAbleList() {
+    this.isAbleListPositions = !this.isAbleListPositions
+  }
+
+
+  //--------- function are related to employee's positions --------------
+  removePosition(index: number) {
+    let posIndex = this.empPositions.findIndex(p => p.positionId == index)
+    if (posIndex != -1) {
+      this.empPositions.splice(posIndex, 1)
+    }
+    this.initialShowPositions()
+  }
+
+  get positionFormControls() {
+    return this.posForm!.controls
+  }
+
+  //--------- function are related to add position to the employee --------------
+  addDateField(posId: number) {
+    this.isShowDateField = !this.isShowDateField
+    this.positionIdSelected = posId
+  }
+
+  AddPositionToEmp() {
+    if (this.checksValidationDates('date', 'startJob')) {
+      this.validPosForm = true
+      this.empPositions.push({
+        positionId: this.positionIdSelected,
+        startPositionDate: this.posForm!.value.date,
+        id: undefined,
+        employeeId: undefined,
+        isAdministrative: this.posForm!.value.isAdmin
+      })
+
+      this.isShowDateField = false
+      this.initialShowPositions()
+      this.positionIdSelected = undefined
+    }
+    else {
+      this.validPosForm = false
+    }
+  }
+
+  //--------- function are related to added new position --------------
+  ableNewPosition() {
+    this.isAbleNewPosition = true
+  }
+
   postPosition() {
-
-    this.position = this.newPosForm.value
-    let exists = this.allPositions.find(p => p.name == this.position.name &&
-      (p.isAdministrative && this.position.isAdministrative.valueOf() == true ||
-        !p.isAdministrative && this.position.isAdministrative.valueOf() == false
-      ))
-    if (this.newPosForm.status == 'VALID' && exists) {
+    let exists = this.allPositions.find(p => p.name?.toLowerCase() == this.position.name?.toLocaleLowerCase())
+    if (exists) {
       this.validNewPosForm = false
       console.log("this positon already exists")
     }
@@ -269,7 +310,7 @@ export class AddUpdateEmployeeComponent {
         next: () => {
           this.isAbleNewPosition = false
           this.getPostionsList()
-          this.newPosForm.reset()
+          this.position.name = ""
         },
         error: err => {
           this.errosFunction(err.status)
@@ -279,6 +320,8 @@ export class AddUpdateEmployeeComponent {
     }
   }
 
+
+  //---------- Update employee functions ---------
   removeEmp() {
     Swal.fire({
       title: "Are you sure?",
@@ -303,10 +346,8 @@ export class AddUpdateEmployeeComponent {
             this.errosFunction(err.status)
           }
         })
-        
       }
     });
-    
   }
 
   updateTerms() {
@@ -318,54 +359,29 @@ export class AddUpdateEmployeeComponent {
   }
 
 
-  // all this functions are related to the employee positions
-  get positionFormControls() {
-    return this.posForm.controls
-  }
-
-  initialShowPositions() {
-    this.showPositions = this.allPositions.filter(p =>
-      !this.empPositions.find(ep => ep.positionId == p.id)
-    )
-  }
-
-  removePosition(index: number) {
-    let posIndex = this.empPositions.findIndex(p => p.positionId == index)
-    if (posIndex != -1) {
-      this.empPositions.splice(posIndex, 1)
-    }
-    this.initialShowPositions()
-  }
-
-  ableNewPosition() {
-    this.isAbleNewPosition = true
-  }
-
-  changeAbleList() {
-    this.isAbleListPositions = !this.isAbleListPositions
-  }
-
-  addDateField(posId: number) {
-    this.isShowDateField = !this.isShowDateField
-    this.positionIdSelected = posId
-  }
-
-  enableAddPosition() {
-    if (this.checksValidationDates('date', 'startJob')) {
-      this.validPosForm = true
-      this.empPositions.push({
-        positionId: this.positionIdSelected,
-        startPositionDate: this.posForm.value.date,
-        id: undefined,
-        employeeId: undefined
-      })
-
-      this.isShowDateField = false
-      this.initialShowPositions()
-      this.positionIdSelected = undefined
-    }
-    else {
-      this.validPosForm = false
+  //--------- Error handle ----------------
+  errosFunction(statusCode: number) {
+    switch (statusCode) {
+      case 400:
+        this.badRequest()
+        break
+      case 401:
+        UnauthorizedError()
+        break
+      case 404:
+        this.pageNotFound()
+        break
+      default:
+        this._router.navigate(['error'])
     }
   }
+
+  badRequest() {
+    this._router.navigate([`error?mess=${errorsEnum.BADREQUEST}`])
+  }
+
+  pageNotFound() {
+    this._router.navigate([`error?mess=${errorsEnum.NOTFOUND}`])
+  }
+
 }

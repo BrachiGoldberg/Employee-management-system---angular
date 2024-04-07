@@ -1,0 +1,48 @@
+.footer {
+  padding: 20px 0;
+  width: 100%;
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.footer-animation {
+  font-size: 24px;
+}
+
+.animated-name {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-20px);
+  }
+
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+.copyright,
+.management,
+.email {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #484f55;
+}
+
+#color-bg{
+  background-color: rgb(86, 60, 60, 0.7);
+
+}

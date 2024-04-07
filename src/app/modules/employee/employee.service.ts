@@ -6,6 +6,7 @@ import { EmployeePosition, Position } from './models/position.model.';
 import { EmployeeTerms } from './models/employee-terms.model';
 import { BankAccount } from './models/bank-account.model';
 import { map } from 'rxjs/operators';
+import { AttendanceJournal, AttendanceJournalPostModel } from './models/attendance-journal.model';
 
 
 const baseUrl = 'https://localhost:7081/api'
@@ -99,7 +100,6 @@ export class EmployeeService {
     let token = this.getTokenBearer()
     return this._http.post<Position>(`${baseUrl}/Position`, {
       "name": position.name,
-      "isAdministrative": position.isAdministrative.valueOf() == true ? true : false
     }, { headers: { "Authorization": `Bearer ${token}` } })
   }
 
@@ -156,6 +156,14 @@ export class EmployeeService {
   updateAccount(id: number, account: BankAccount): Observable<BankAccount> {
     let token = this.getTokenBearer()
     return this._http.put<BankAccount>(`${baseUrl}/BankAccount/${id}`, account, { headers: { "Authorization": `Bearer ${token}` } })
+  }
+
+
+  //---------------- Attendance Journal --------------------
+  addListAtendanceJournals(fileContent: AttendanceJournalPostModel[]): Observable<AttendanceJournal> {
+    let token = this.getTokenBearer()
+    return this._http.post<AttendanceJournal>(`${baseUrl}/AttendanceJournal`, 
+      fileContent, { headers: { "Authorization": `Bearer ${token}` } })
   }
 
 }

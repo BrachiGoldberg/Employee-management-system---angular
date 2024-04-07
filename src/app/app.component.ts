@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import Swal from 'sweetalert2';
+import { HeaderComponent } from './header/header.component';
+import { FooterComponent } from './footer/footer.component';
 
 export enum errorsEnum { NOTFOUND = "notFound", BADREQUEST = "badRequest" }
 export function UnauthorizedError() {
@@ -18,7 +20,7 @@ export function UnauthorizedError() {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterModule, HomeComponent],
+  imports: [RouterOutlet, RouterModule, HomeComponent, HeaderComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -27,8 +29,5 @@ export class AppComponent {
 
   constructor(private _router: Router) { }
 
-  logOut() {
-    sessionStorage.clear()
-    this._router.navigate(['company'])
-  }
+ 
 }

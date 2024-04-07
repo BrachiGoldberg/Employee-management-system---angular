@@ -5,7 +5,6 @@ export class Position {
 
     id: number | undefined
     name: string | undefined
-    isAdministrative: boolean = false
 
 }
 
@@ -16,5 +15,6 @@ export class EmployeePosition{
     startPositionDate: Date | undefined
     positionId: number | undefined
     employeeId: number | undefined
+    isAdministrative: boolean = false
     
 }

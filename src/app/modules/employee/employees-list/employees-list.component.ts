@@ -3,6 +3,8 @@ import { EmployeeService } from '../employee.service';
 import { Employee } from '../models/employee.model';
 import { Router } from '@angular/router';
 import { UnauthorizedError, errorsEnum } from '../../../app.component';
+import { AttendanceJournalPostModel } from '../models/attendance-journal.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-employees-list',
@@ -16,7 +18,7 @@ export class EmployeesListComponent {
   companyId: number | undefined
   searchText: string | undefined
   classDropdown: string = ""
-  hoursFile: any
+  hoursFile: File | undefined
 
   constructor(private _service: EmployeeService, private _router: Router) { }
 
@@ -119,8 +121,46 @@ export class EmployeesListComponent {
       this.classDropdown = ""
   }
 
-  addHours(data: any) {
 
-    const file: File = data?.target?.files
+  async addHours(data: any) {
+
+    const file: File = data?.target?.files[0]
+    let fileContent = await file.text()
+    let attends = fileContent.split('\n')
+    console.log(attends)
+    let attendJourList: AttendanceJournalPostModel[] = []
+    for (let i = 1; i < attends.length - 1; i++) {
+      let newAttend = new AttendanceJournalPostModel()
+      let splits = attends[i].split(',')
+      let empId = splits[1]
+      let date = splits[2]
+      let beginTime = splits[3]
+      let endTime = splits[4]
+
+      newAttend.employeeId = +empId
+      newAttend.date = new Date(date)
+      let beginHours = beginTime.split(':')
+      newAttend.beginHour = +beginHours[0]
+      newAttend.beginMinutes = +beginHours[1]
+      let endHours = endTime.split(':')
+      newAttend.endHour = +endHours[0]
+      newAttend.endMinutes = +endHours[1]
+      attendJourList.push(newAttend)
+    }
+    attendJourList.splice(attendJourList.length, 1)
+    this._service.addListAtendanceJournals(attendJourList).subscribe({
+      next: () => {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "The attendance hours have been successfully recorded",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      },
+      error: err => {
+        this.errosFunction(err.status)
+      }
+    })
   }
 }
